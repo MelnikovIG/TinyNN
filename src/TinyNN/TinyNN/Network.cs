@@ -47,7 +47,7 @@ namespace TinyNN
         public string Activation;
     }
     
-    public class Network
+    public partial class Network
     {
         private const int biasVal = 1;
 
