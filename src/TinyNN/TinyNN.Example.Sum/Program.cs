@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.Linq;
 
-namespace TinyNN.Example.Average
+namespace TinyNN.Example.Sum
 {
     public class Program
     {
@@ -11,7 +11,7 @@ namespace TinyNN.Example.Average
                 new Layer(InputsLength, Activations.Sigmoid),
                 new Layer(10, Activations.Sigmoid),
                 new Layer(5, Activations.Sigmoid),
-                new Layer(1, Activations.Sigmoid),
+                new Layer(1, Activations.Relu),
             };
             
             var network = new Network(layers);
@@ -53,7 +53,7 @@ namespace TinyNN.Example.Average
                 inp[i] = rnd.NextDouble();
             }
 
-            var @out = inp.Average();
+            var @out = inp.Sum();
 
             return (inp, new[] {@out});
         }

@@ -6,6 +6,7 @@ namespace TinyNN
     public static class Activations
     {
         public const string Sigmoid = nameof(Sigmoid);
+        public const string Relu = nameof(Relu);
     }
 
     public static class SigmoidActivation
@@ -18,6 +19,19 @@ namespace TinyNN
         public static double CalcDer(double val)
         {
             return val * (1 - val);
+        }
+    }
+    
+    public static class ReluActivation
+    {
+        public static double Calc(double val)
+        {
+            return val > 0 ? val : 0;
+        }
+
+        public static double CalcDer(double val)
+        {
+            return val > 0 ? 1 : 0;
         }
     }
     
@@ -106,7 +120,7 @@ namespace TinyNN
         
         private void BackPropagate(double[] outputs, double[][] nodeOutputs)
         {
-            const double learningRate = 0.5;
+            const double learningRate = 0.1;
 
             var deltas = new double[_layers.Length][];
             for (int i = 0; i < _layers.Length; i++)
@@ -185,7 +199,7 @@ namespace TinyNN
                 var layerNeuronsCount = _layers[layerIdx].NeuronsCount;
                 int neuronsInPreviousLayer = _layers[layerIdx - 1].NeuronsCount;
                 
-                var activationFn = _layers[layerIdx - 1].Activation;
+                var activationFn = _layers[layerIdx].Activation;
 
                 for (int layerNeuronIdx = 0; layerNeuronIdx < layerNeuronsCount; layerNeuronIdx++)
                 {
@@ -211,6 +225,7 @@ namespace TinyNN
             switch (activation)
             {
                 case Activations.Sigmoid: return SigmoidActivation.Calc(val);
+                case Activations.Relu: return ReluActivation.Calc(val);
             }
             
             throw new ArgumentException();
@@ -221,6 +236,7 @@ namespace TinyNN
             switch (activation)
             {
                 case Activations.Sigmoid: return SigmoidActivation.CalcDer(val);
+                case Activations.Relu: return ReluActivation.CalcDer(val);
             }
             
             throw new ArgumentException();
