@@ -2,17 +2,25 @@ using System;
 using System.Globalization;
 using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace TinyNN.Tests
 {
     public class NetworkTests
     {
+        private readonly ITestOutputHelper _output;
+
+        public NetworkTests(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+        
         [Fact]
         public void TestNoHiddenLayers()
         {
             var settings = ReadSettingsHardcoded();
             
-            Console.Error.WriteLine(settings);
+            _output.WriteLine(settings);
             
             NetworkSettings networkSettings = GetNetworkSettings(settings);
             Network network = new Network(networkSettings);
@@ -21,7 +29,7 @@ namespace TinyNN.Tests
             {
                 for (int i = 0; i < networkSettings.TrainingExamplesCount; i++)
                 {
-                    network.Learn(networkSettings.TrainingInputs[i].Data, networkSettings.ExpectedOutputs[i].Data);
+                    var err = network.Train(networkSettings.TrainingInputs[i].Data, networkSettings.ExpectedOutputs[i].Data);
                 }
             }
 
@@ -34,7 +42,7 @@ namespace TinyNN.Tests
             var idx = 0;
             foreach (var testInput in networkSettings.TestInputs)
             {
-                var result = network.Calculate(testInput.Data);
+                var result = network.Predict(testInput.Data);
 
                 var res = result[0];
                 
@@ -58,7 +66,7 @@ namespace TinyNN.Tests
             {
                 for (int i = 0; i < networkSettings.TrainingExamplesCount; i++)
                 {
-                    network.Learn(networkSettings.TrainingInputs[i].Data, networkSettings.ExpectedOutputs[i].Data);
+                    var err = network.Train(networkSettings.TrainingInputs[i].Data, networkSettings.ExpectedOutputs[i].Data);
                 }
             }
 
@@ -73,7 +81,7 @@ namespace TinyNN.Tests
             var idx = 0;
             foreach (var testInput in networkSettings.TestInputs)
             {
-                var result = network.Calculate(testInput.Data);
+                var result = network.Predict(testInput.Data);
 
                 var res = result[0];
                 
@@ -108,7 +116,7 @@ namespace TinyNN.Tests
             settings.TestInputs = new InputData[settings.TestInputsCount];
             for (int i = 0; i < settings.TestInputsCount; i++)
             {
-                settings.TestInputs[i] = new InputData(lines[lineIdx++].Select(CharUnicodeInfo.GetDigitValue).ToArray());
+                settings.TestInputs[i] = new InputData(lines[lineIdx++].Select(x => (double)CharUnicodeInfo.GetDigitValue(x)).ToArray());
             }
             
             settings.TrainingInputs = new InputData[settings.TrainingExamplesCount];
@@ -116,8 +124,8 @@ namespace TinyNN.Tests
             for (int i = 0; i < settings.TrainingExamplesCount; i++)
             {
                 inputs = lines[lineIdx++].Split(' ');
-                settings.TrainingInputs[i] = new InputData(inputs[0].Select(CharUnicodeInfo.GetDigitValue).ToArray());
-                settings.ExpectedOutputs[i] = new OutputData(inputs[1].Select(CharUnicodeInfo.GetDigitValue).ToArray());
+                settings.TrainingInputs[i] = new InputData(inputs[0].Select(x => (double)CharUnicodeInfo.GetDigitValue(x)).ToArray());
+                settings.ExpectedOutputs[i] = new OutputData(inputs[1].Select(x => (double)CharUnicodeInfo.GetDigitValue(x)).ToArray());
             }
             return settings;
         }

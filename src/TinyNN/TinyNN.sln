@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyNN", "TinyNN\TinyNN.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyNN.Tests", "TinyNN.Tests\TinyNN.Tests.csproj", "{C97B84AF-29CA-44AE-B10E-7174F5433E03}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{D3F8DB0D-00DE-4C95-8F03-B4302E1ACAC3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyNN.Example.Average", "TinyNN.Example.Average\TinyNN.Example.Average.csproj", "{C934D2C2-8B53-4D21-B271-F8B4AC5069D1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,12 @@ Global
 		{C97B84AF-29CA-44AE-B10E-7174F5433E03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C97B84AF-29CA-44AE-B10E-7174F5433E03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C97B84AF-29CA-44AE-B10E-7174F5433E03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C934D2C2-8B53-4D21-B271-F8B4AC5069D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C934D2C2-8B53-4D21-B271-F8B4AC5069D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C934D2C2-8B53-4D21-B271-F8B4AC5069D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C934D2C2-8B53-4D21-B271-F8B4AC5069D1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C934D2C2-8B53-4D21-B271-F8B4AC5069D1} = {D3F8DB0D-00DE-4C95-8F03-B4302E1ACAC3}
 	EndGlobalSection
 EndGlobal

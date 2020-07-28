@@ -2,11 +2,11 @@ namespace TinyNN
 {
     public class OutputData
     {
-        public OutputData(int[] data)
+        public OutputData(double[] data)
         {
             Data = data;
         }
         
-        public int[] Data;
+        public double[] Data;
     }
 }

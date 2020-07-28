@@ -9,7 +9,6 @@ namespace TinyNN
 
         private int[] _layers; //layers
 
-        // private double[][] _neurons;//neurons  
         private double[][][] _weights; //weights   
         private LCG _generator;
 
@@ -37,8 +36,7 @@ namespace TinyNN
                         neuronWeights[prevLayerNeuronIdx] = _generator.NextNormalized();
                     }
 
-                    neuronWeights[neuronsInPreviousLayer] = _generator.NextNormalized();
-                    ; //NOTE: bias
+                    neuronWeights[neuronsInPreviousLayer] = _generator.NextNormalized(); //NOTE: bias
 
                     layerWeightsList.Add(neuronWeights);
                 }
@@ -64,19 +62,34 @@ namespace TinyNN
         }
 
 
-        public double[] Calculate(int[] inputs)
+        public double[] Predict(double[] inputs)
         {
             var nodeOutputs = FeedForward(inputs);
             return nodeOutputs[_layers.Length - 1];
         }
 
-        public void Learn(int[] inputs, int[] outputs)
+        public double Train(double[] inputs, double[] outputs)
         {
             var nodeOutputs = FeedForward(inputs);
+            
             BackPropagate(outputs, nodeOutputs);
+
+            var error = CalculateError(nodeOutputs[_layers.Length - 1], outputs);
+            return error;
         }
 
-        private void BackPropagate(int[] outputs, double[][] nodeOutputs)
+        private double CalculateError(double[] lastLayerOutputs, double[] outputs)
+        {
+            var sumSqrErr = 0.0;
+            for (int i = 0; i < outputs.Length; i++)
+            {
+                sumSqrErr += Math.Pow(outputs[i] - lastLayerOutputs[i], 2);
+            }
+            var error = 0.5 * sumSqrErr;
+            return error;
+        }
+        
+        private void BackPropagate(double[] outputs, double[][] nodeOutputs)
         {
             const double learningRate = 0.5;
 
@@ -138,7 +151,7 @@ namespace TinyNN
             }
         }
 
-        private double[][] FeedForward(int[] inputs)
+        private double[][] FeedForward(double[] inputs)
         {
             var nodeOutputs = new double[_layers.Length][];
             for (int i = 0; i < _layers.Length; i++)
@@ -177,7 +190,7 @@ namespace TinyNN
 
         public static double Sigmoid(double value)
         {
-            return 1.0 / (1.0 + Math.Pow(Math.E, -value));
+            return 1.0 / (1.0 + Math.Exp(-value));
         }
     }
 }
