@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Xunit;
@@ -23,7 +24,16 @@ namespace TinyNN.Tests
             _output.WriteLine(settings);
             
             NetworkSettings networkSettings = GetNetworkSettings(settings);
-            Network network = new Network(networkSettings);
+
+            List<Layer> layers = new List<Layer>();
+            layers.Add(new Layer(networkSettings.InputsCount, Activations.Sigmoid));
+            foreach (var hiddenLayerNeurons in networkSettings.HiddenLayers)
+            {
+                layers.Add(new Layer(hiddenLayerNeurons, Activations.Sigmoid));
+            }
+            layers.Add(new Layer(networkSettings.OutputsCount, Activations.Sigmoid));
+
+            Network network = new Network(layers.ToArray());
             
             for (int trainingIteration = 0; trainingIteration < networkSettings.TrainingIterations; trainingIteration++)
             {
@@ -60,7 +70,15 @@ namespace TinyNN.Tests
             Console.Error.WriteLine(settings);
             
             NetworkSettings networkSettings = GetNetworkSettings(settings);
-            Network network = new Network(networkSettings);
+            List<Layer> layers = new List<Layer>();
+            layers.Add(new Layer(networkSettings.InputsCount, Activations.Sigmoid));
+            foreach (var hiddenLayerNeurons in networkSettings.HiddenLayers)
+            {
+                layers.Add(new Layer(hiddenLayerNeurons, Activations.Sigmoid));
+            }
+            layers.Add(new Layer(networkSettings.OutputsCount, Activations.Sigmoid));
+
+            Network network = new Network(layers.ToArray());
             
             for (int trainingIteration = 0; trainingIteration < networkSettings.TrainingIterations; trainingIteration++)
             {

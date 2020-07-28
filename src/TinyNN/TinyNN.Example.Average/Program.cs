@@ -7,14 +7,14 @@ namespace TinyNN.Example.Average
     {
         public static void Main()
         {
-            var settings = new NetworkSettings
-            {
-                InputsCount = InputsLength,
-                HiddenLayers = new int[] {10, 5},
-                OutputsCount = 1
+            Layer[] layers = {
+                new Layer(InputsLength, Activations.Sigmoid),
+                new Layer(10, Activations.Sigmoid),
+                new Layer(5, Activations.Sigmoid),
+                new Layer(1, Activations.Sigmoid),
             };
             
-            var network = new Network(settings);
+            var network = new Network(layers);
             
             //Train
             for (int i = 0; i < 10_000_000; i++)

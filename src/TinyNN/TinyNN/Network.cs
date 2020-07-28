@@ -3,20 +3,50 @@ using System.Collections.Generic;
 
 namespace TinyNN
 {
+    public static class Activations
+    {
+        public const string Sigmoid = nameof(Sigmoid);
+    }
+
+    public static class SigmoidActivation
+    {
+        public static double Calc(double val)
+        {
+            return 1.0 / (1.0 + Math.Exp(-val));
+        }
+
+        public static double CalcDer(double val)
+        {
+            return val * (1 - val);
+        }
+    }
+    
+    public class Layer
+    {
+        public Layer(int neuronsCount, string activation)
+        {
+            NeuronsCount = neuronsCount;
+            Activation = activation;
+        }
+        
+        public int NeuronsCount;
+        public string Activation;
+    }
+    
     public class Network
     {
         private const int biasVal = 1;
 
-        private int[] _layers; //layers
+        private Layer[] _layers; //layers
 
         private double[][][] _weights; //weights   
         private LCG _generator;
 
-        public Network(NetworkSettings settings)
+        public Network(Layer[] layers)
         {
             _generator = new LCG();
-
-            InitLayers(settings);
+            _layers = layers;
+            
             InitWeights();
         }
 
@@ -26,9 +56,9 @@ namespace TinyNN
             for (int layerIdx = 1; layerIdx < _layers.Length; layerIdx++)
             {
                 List<double[]> layerWeightsList = new List<double[]>();
-                int neuronsInPreviousLayer = _layers[layerIdx - 1];
+                int neuronsInPreviousLayer = _layers[layerIdx - 1].NeuronsCount;
 
-                for (int layerNeuronIdx = 0; layerNeuronIdx < _layers[layerIdx]; layerNeuronIdx++)
+                for (int layerNeuronIdx = 0; layerNeuronIdx < _layers[layerIdx].NeuronsCount; layerNeuronIdx++)
                 {
                     double[] neuronWeights = new double[neuronsInPreviousLayer + 1];
                     for (int prevLayerNeuronIdx = 0; prevLayerNeuronIdx < neuronsInPreviousLayer; prevLayerNeuronIdx++)
@@ -46,21 +76,6 @@ namespace TinyNN
 
             _weights = weightsList.ToArray();
         }
-
-        private void InitLayers(NetworkSettings settings)
-        {
-            var layers = new List<int>();
-            layers.Add(settings.InputsCount);
-            foreach (var hiddenLayer in settings.HiddenLayers)
-            {
-                layers.Add(hiddenLayer);
-            }
-
-            layers.Add(settings.OutputsCount);
-
-            _layers = layers.ToArray();
-        }
-
 
         public double[] Predict(double[] inputs)
         {
@@ -96,27 +111,28 @@ namespace TinyNN
             var deltas = new double[_layers.Length][];
             for (int i = 0; i < _layers.Length; i++)
             {
-                deltas[i] = new double[_layers[i]];
+                deltas[i] = new double[_layers[i].NeuronsCount];
             }
 
             //calc deltas
             for (int layerIdx = _layers.Length - 1; layerIdx > 0; layerIdx--)
             {
-                var layerNeuronsCount = _layers[layerIdx];
-
+                var layerNeuronsCount = _layers[layerIdx].NeuronsCount;
+                var activation = _layers[layerIdx].Activation;
+                
                 for (int layerNeuronIdx = 0; layerNeuronIdx < layerNeuronsCount; layerNeuronIdx++)
                 {
                     if (layerIdx == _layers.Length - 1)
                     {
                         var val = nodeOutputs[layerIdx][layerNeuronIdx];
-                        deltas[layerIdx][layerNeuronIdx] = val * (1 - val) * (val - outputs[layerNeuronIdx]);
+                        deltas[layerIdx][layerNeuronIdx] = ActivationDer(val, activation) * (val - outputs[layerNeuronIdx]);
                     }
                     else
                     {
                         var val = nodeOutputs[layerIdx][layerNeuronIdx];
 
                         double sum = 0;
-                        int neuronsInNextLayer = _layers[layerIdx + 1];
+                        int neuronsInNextLayer = _layers[layerIdx + 1].NeuronsCount;
 
                         for (int nextLayerNeuronIdx = 0; nextLayerNeuronIdx < neuronsInNextLayer; nextLayerNeuronIdx++)
                         {
@@ -124,7 +140,7 @@ namespace TinyNN
                                    _weights[layerIdx][nextLayerNeuronIdx][layerNeuronIdx];
                         }
 
-                        deltas[layerIdx][layerNeuronIdx] = val * (1 - val) * sum;
+                        deltas[layerIdx][layerNeuronIdx] = ActivationDer(val, activation) * sum;
                     }
                 }
             }
@@ -132,11 +148,11 @@ namespace TinyNN
             //update weights
             for (int layerIdx = _layers.Length - 1; layerIdx > 0; layerIdx--)
             {
-                var layerNeuronsCount = _layers[layerIdx];
+                var layerNeuronsCount = _layers[layerIdx].NeuronsCount;
 
                 for (int layerNeuronIdx = 0; layerNeuronIdx < layerNeuronsCount; layerNeuronIdx++)
                 {
-                    int neuronsInPreviousLayer = _layers[layerIdx - 1];
+                    int neuronsInPreviousLayer = _layers[layerIdx - 1].NeuronsCount;
 
                     for (int prevLayerNeuronIdx = 0; prevLayerNeuronIdx < neuronsInPreviousLayer; prevLayerNeuronIdx++)
                     {
@@ -156,7 +172,7 @@ namespace TinyNN
             var nodeOutputs = new double[_layers.Length][];
             for (int i = 0; i < _layers.Length; i++)
             {
-                nodeOutputs[i] = new double[_layers[i]];
+                nodeOutputs[i] = new double[_layers[i].NeuronsCount];
             }
 
             for (var index = 0; index < inputs.Length; index++)
@@ -166,8 +182,10 @@ namespace TinyNN
 
             for (int layerIdx = 1; layerIdx < _layers.Length; layerIdx++)
             {
-                var layerNeuronsCount = _layers[layerIdx];
-                int neuronsInPreviousLayer = _layers[layerIdx - 1];
+                var layerNeuronsCount = _layers[layerIdx].NeuronsCount;
+                int neuronsInPreviousLayer = _layers[layerIdx - 1].NeuronsCount;
+                
+                var activationFn = _layers[layerIdx - 1].Activation;
 
                 for (int layerNeuronIdx = 0; layerNeuronIdx < layerNeuronsCount; layerNeuronIdx++)
                 {
@@ -180,17 +198,32 @@ namespace TinyNN
 
                     var biasW = _weights[layerIdx - 1][layerNeuronIdx][neuronsInPreviousLayer]; //NOTE: bias
                     nodeOutputs[layerIdx][layerNeuronIdx] += biasW * biasVal;
-
-                    nodeOutputs[layerIdx][layerNeuronIdx] = Sigmoid(nodeOutputs[layerIdx][layerNeuronIdx]);
+                    
+                    nodeOutputs[layerIdx][layerNeuronIdx] = Activation(nodeOutputs[layerIdx][layerNeuronIdx], activationFn);
                 }
             }
 
             return nodeOutputs;
         }
 
-        public static double Sigmoid(double value)
+        private double Activation(double val, string activation)
         {
-            return 1.0 / (1.0 + Math.Exp(-value));
+            switch (activation)
+            {
+                case Activations.Sigmoid: return SigmoidActivation.Calc(val);
+            }
+            
+            throw new ArgumentException();
+        }
+
+        private double ActivationDer(double val, string activation)
+        {
+            switch (activation)
+            {
+                case Activations.Sigmoid: return SigmoidActivation.CalcDer(val);
+            }
+            
+            throw new ArgumentException();
         }
     }
 }
