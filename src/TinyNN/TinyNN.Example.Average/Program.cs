@@ -14,7 +14,7 @@ namespace TinyNN.Example.Average
                 new Layer(1, Activations.Sigmoid),
             };
             
-            var network = new Network(layers);
+            var network = new Network(layers, 0.1);
             
             //Train
             for (int i = 0; i < 1_000_000; i++)

@@ -33,7 +33,7 @@ namespace TinyNN.Tests
             }
             layers.Add(new Layer(networkSettings.OutputsCount, Activations.Sigmoid));
 
-            Network network = new Network(layers.ToArray());
+            Network network = new Network(layers.ToArray(), 0.5);
             
             for (int trainingIteration = 0; trainingIteration < networkSettings.TrainingIterations; trainingIteration++)
             {
@@ -78,7 +78,7 @@ namespace TinyNN.Tests
             }
             layers.Add(new Layer(networkSettings.OutputsCount, Activations.Sigmoid));
 
-            Network network = new Network(layers.ToArray());
+            Network network = new Network(layers.ToArray(), 0.5);
             
             for (int trainingIteration = 0; trainingIteration < networkSettings.TrainingIterations; trainingIteration++)
             {

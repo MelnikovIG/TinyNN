@@ -14,7 +14,7 @@ namespace TinyNN.Example.Sum
                 new Layer(1, Activations.Relu),
             };
             
-            var network = new Network(layers);
+            var network = new Network(layers, 0.1);
             
             //Train
             for (int i = 0; i < 1_000_000; i++)

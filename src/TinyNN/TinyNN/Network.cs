@@ -52,15 +52,17 @@ namespace TinyNN
         private const int biasVal = 1;
 
         private Layer[] _layers; //layers
+        private readonly double _learningRate;
 
         private double[][][] _weights; //weights   
         private LCG _generator;
 
-        public Network(Layer[] layers)
+        public Network(Layer[] layers, double learningRate)
         {
             _generator = new LCG();
             _layers = layers;
-            
+            _learningRate = learningRate;
+
             InitWeights();
         }
 
@@ -120,8 +122,6 @@ namespace TinyNN
         
         private void BackPropagate(double[] outputs, double[][] nodeOutputs)
         {
-            const double learningRate = 0.1;
-
             var deltas = new double[_layers.Length][];
             for (int i = 0; i < _layers.Length; i++)
             {
@@ -170,12 +170,12 @@ namespace TinyNN
 
                     for (int prevLayerNeuronIdx = 0; prevLayerNeuronIdx < neuronsInPreviousLayer; prevLayerNeuronIdx++)
                     {
-                        var dw = -learningRate * deltas[layerIdx][layerNeuronIdx] *
+                        var dw = -_learningRate * deltas[layerIdx][layerNeuronIdx] *
                                  nodeOutputs[layerIdx - 1][prevLayerNeuronIdx];
                         _weights[layerIdx - 1][layerNeuronIdx][prevLayerNeuronIdx] += dw;
                     }
 
-                    var biasDw = -learningRate * deltas[layerIdx][layerNeuronIdx];
+                    var biasDw = -_learningRate * deltas[layerIdx][layerNeuronIdx];
                     _weights[layerIdx - 1][layerNeuronIdx][neuronsInPreviousLayer] += biasDw;
                 }
             }

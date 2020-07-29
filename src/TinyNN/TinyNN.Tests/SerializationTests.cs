@@ -14,7 +14,7 @@ namespace TinyNN.Tests
                 new Layer(1, Activations.Sigmoid),
             };
             
-            var network = new Network(layers);
+            var network = new Network(layers, 0.1);
 
             var serializedWeights = network.CloneWeights();
             network.SetWeights(serializedWeights, true);
