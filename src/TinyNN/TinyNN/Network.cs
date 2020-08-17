@@ -7,6 +7,7 @@ namespace TinyNN
     {
         public const string Sigmoid = nameof(Sigmoid);
         public const string Relu = nameof(Relu);
+        public const string Tanh = nameof(Tanh);
     }
 
     public static class SigmoidActivation
@@ -19,6 +20,19 @@ namespace TinyNN
         public static double CalcDer(double val)
         {
             return val * (1 - val);
+        }
+    }
+    
+    public static class TanhActivation
+    {
+        public static double Calc(double val)
+        {
+            return Math.Tanh(val);
+        }
+
+        public static double CalcDer(double val)
+        {
+            return 1 - (val * val);
         }
     }
     
@@ -226,6 +240,7 @@ namespace TinyNN
             {
                 case Activations.Sigmoid: return SigmoidActivation.Calc(val);
                 case Activations.Relu: return ReluActivation.Calc(val);
+                case Activations.Tanh: return TanhActivation.Calc(val);
             }
             
             throw new ArgumentException();
@@ -237,6 +252,7 @@ namespace TinyNN
             {
                 case Activations.Sigmoid: return SigmoidActivation.CalcDer(val);
                 case Activations.Relu: return ReluActivation.CalcDer(val);
+                case Activations.Tanh: return TanhActivation.CalcDer(val);
             }
             
             throw new ArgumentException();
